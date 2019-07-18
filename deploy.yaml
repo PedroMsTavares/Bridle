@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: bridle-svc
+  namespace: kube-system
+  labels:
+    name: bridle-svc
+spec:
+  ports:
+    - name: webhook
+      port: 443
+      targetPort: 8443
+  selector:
+    name: bridle
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+ name: bridle
+ namespace: kube-system
+ labels:
+    name: bridle
+spec:
+ replicas: 1
+ template:
+    metadata:
+     name: bridle
+     labels:
+       name: bridle
+    spec:
+     serviceAccountName: kube-proxy
+     containers:
+       - name: webhook
+         image: serverlessp/bridle:0.0.8 # make sure to build and tag the image first!
+         imagePullPolicy: Always
+         volumeMounts:
+           - name: webhook-certs
+             mountPath: /certificates
+             readOnly: true
+           - mountPath: /var/run/docker.sock
+             name: docker-sock
+             readOnly: false
+     restartPolicy: Always
+     volumes:
+       - name: webhook-certs
+         secret:
+           secretName: bridle-secret
+       - name: docker-sock
+         hostPath:
+           path: /var/run/docker.sock
+
+---
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: bridle
+  labels:
+    app: bridle
+webhooks:
+  - name: bridle-svc.kube-system.svc
+    clientConfig:
+      service:
+        name: bridle-svc
+        namespace: kube-system
+        path: "/"
+      caBundle: <YOURCABUNDLE>
+    rules:  
+      - operations: ["CREATE"]
+        apiGroups: ["*"]
+        apiVersions: ["*"]
+        resources: ["pods"]
