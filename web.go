@@ -2,13 +2,19 @@ package main
 
 import (
 	//	"encoding/json"
+	"encoding/json"
 	"github.com/tidwall/gjson"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
 	"os"
+	"strings"
 )
+
+type AdmissionResponse struct {
+	UID     string
+	Allowed bool
+}
 
 func Validate(w http.ResponseWriter, r *http.Request) {
 
@@ -23,12 +29,12 @@ func Validate(w http.ResponseWriter, r *http.Request) {
 
 	bodyString := string(b)
 	containers := gjson.Get(bodyString, "request.object.spec.containers")
-	
+	uid := gjson.Get(bodyString, "request.uid")
+
 	containersarray := containers.Array()
 
 	// lets get all the images and send them to the Go magic
 	for _, img := range containersarray {
-
 
 		image := gjson.Get(img.String(), "image")
 
@@ -37,6 +43,15 @@ func Validate(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
+
+	admissionResponse := &AdmissionResponse{
+		UID:     uid.String(),
+		Allowed: true,
+	}
+	response, err := json.Marshal(admissionResponse)
+	CheckIfError(err)
+	w.Header().Set("content-type", "application/json")
+	w.Write(response)
 
 }
 

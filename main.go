@@ -2,15 +2,13 @@ package main
 
 import (
 	"net/http"
-
 )
 
 func main() {
 
 	http.HandleFunc("/", Validate)
 	http.HandleFunc("/ping", ping)
-	// err := http.ListenAndServeTLS(":8443", "/certificates/cert.pem", "/certificates/key.pem", nil)
-	err := http.ListenAndServe(":8081", nil)
+	err := http.ListenAndServeTLS(":8443", "/certificates/cert.pem", "/certificates/key.pem", nil)
 	CheckIfError(err)
 
 }
