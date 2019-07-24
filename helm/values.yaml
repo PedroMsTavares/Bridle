@@ -1,10 +1,8 @@
 ---
 name: bridle 
-image: serverlessp/bridle:0.0.8
+image: serverlessp/bridle:0.0.3
 replicas: 1
 namespace: kube-system
-
-BundleCa: ""
 
 secretName: bridle-secret
 

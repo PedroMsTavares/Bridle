@@ -12,7 +12,7 @@ webhooks:
         name: {{ .Values.name }}-svc
         namespace: {{ .Values.namespace }}
         path: "/"
-      caBundle: {{ .Values.BundleCa  }}
+      caBundle: {{ .Values.caBundle }}
     rules:  
       - operations: ["CREATE"]
         apiGroups: ["*"]

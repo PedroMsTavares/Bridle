@@ -123,7 +123,7 @@ kubectl create secret generic ${secret} \
         --from-file=cert.pem=${tmpdir}/server-cert.pem \
         --dry-run -o yaml |
     kubectl -n ${namespace} apply -f -
-BUNDLECA=$(kubectl config view --raw --minify --flatten -o jsonpath='{.clusters[].cluster.certificate-authority-data}')
+CABUNDLE=$(kubectl config view --raw --minify --flatten -o jsonpath='{.clusters[].cluster.certificate-authority-data}')
 
 
-helm upgrade --install bridle helm --set BundleCA=${BUNDLECA}
+helm upgrade --install bridle helm --set caBundle=${CABUNDLE}
