@@ -1,0 +1,56 @@
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    name: {{ .Values.name }}
+spec:
+  replicas: {{ .Values.replicas}}
+  template:
+     metadata:
+      name: {{ .Values.name }}
+      labels:
+        name: {{ .Values.name }}
+     spec:
+      serviceAccountName: {{ .Values.name }}
+      containers:
+        - name: webhook
+          image: {{ .Values.image}} # make sure to build and tag the image first!
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: webhook-certs
+              mountPath: /certificates
+              readOnly: true
+            - mountPath: /var/run/docker.sock
+              name: docker-sock
+              readOnly: false
+
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+      tolerations:
+{{ toYaml .Values.tolerations | indent 8 }}
+      restartPolicy: Always
+      volumes:
+        - name: webhook-certs
+          secret:
+            secretName: {{ .Values.secretName}}
+        - name: docker-sock
+          hostPath:
+            path: /var/run/docker.sock
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.name }}-svc
+  namespace: kube-system
+  labels:
+    name: {{ .Values.name }}-svc
+spec:
+  ports:
+    - name: webhook
+      port: 443
+      targetPort: 8443
+  selector:
+    name: {{ .Values.name }}

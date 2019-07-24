@@ -41,9 +41,9 @@ while [[ $# -gt 0 ]]; do
     shift
 done
 
-[ -z ${service} ] && service=admission-webhook-example-svc
-[ -z ${secret} ] && secret=admission-webhook-example-certs
-[ -z ${namespace} ] && namespace=default
+[ -z ${service} ] && service=bridle-svc
+[ -z ${secret} ] && secret=bridle-secret
+[ -z ${namespace} ] && namespace=kube-system
 
 if [ ! -x "$(command -v openssl)" ]; then
     echo "openssl not found"
@@ -123,3 +123,7 @@ kubectl create secret generic ${secret} \
         --from-file=cert.pem=${tmpdir}/server-cert.pem \
         --dry-run -o yaml |
     kubectl -n ${namespace} apply -f -
+BUNDLECA=$(kubectl config view --raw --minify --flatten -o jsonpath='{.clusters[].cluster.certificate-authority-data}')
+
+
+helm upgrade --install bridle helm --set BundleCA=${BUNDLECA}

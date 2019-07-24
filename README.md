@@ -13,7 +13,5 @@ _Bridle_ is tiny program writen in Go, that receives a paylod from a Admission W
 
 ## Deployment: 
 
-Admission webhooks need to communicate over TLS , that means , you either have to have a valid certificate or you can generate your own using the script in `tools/certgen.sh`
-
-There is a `deploy.yaml` file with a example of how the deployment. Do not forget to add your on Cabundle in the deploy yaml.
+Run `make deploy` this assumes you have helm. 
     

@@ -1,0 +1,13 @@
+---
+name: bridle 
+image: serverlessp/bridle:0.0.8
+replicas: 1
+namespace: kube-system
+
+BundleCa: ""
+
+secretName: bridle-secret
+
+nodeSelector: {}
+
+tolerations: []
