@@ -17,6 +17,30 @@ import (
 	"github.com/docker/docker/client"
 )
 
+func ImageExists(repo string, imgparam string) bool {
+
+	svc := ecr.New(session.New(&aws.Config{
+		Region: aws.String("eu-west-1")}))
+
+	input := &ecr.ListImagesInput{
+		RepositoryName: aws.String(repo),
+	}
+
+	result, err := svc.ListImages(input)
+	if err == nil {
+		for _, img := range result.ImageIds {
+			a := *img.ImageTag
+
+			if a == imgparam {
+				return true
+			}
+		}
+	}
+
+	return false
+
+}
+
 func ECRRepoExists(reponame string) (exists bool, repouri string) {
 
 	var r []*string

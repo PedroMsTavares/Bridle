@@ -1,6 +1,6 @@
 ---
 name: bridle 
-image: serverlessp/bridle:0.0.3
+image: serverlessp/bridle:0.0.4
 replicas: 1
 namespace: kube-system
 
